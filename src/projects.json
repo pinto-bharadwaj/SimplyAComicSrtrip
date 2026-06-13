@@ -1,0 +1,162 @@
+[
+  {
+    "id": "mr-dad-comics",
+    "title": "Mr. Dad",
+    "subtitle": "Nostalgic & Witty Fatherhood Comics",
+    "description": "Introducing Mr Dad! This project features humorous comics based on the creator's interactions with his dad over the years. It is a fun, light-hearted look at the father-son relationship and will surely resonate with anyone who has a quirky, endearing relationship with their dad.",
+    "category": "comics",
+    "image": "/src/assets/images/regenerated_image_1780745044078.jpg",
+    "tags": ["Comic Strip", "Family Humor", "Slice of Life", "Character Design"],
+    "comicPages": [
+      {
+        "url": "/src/assets/images/regenerated_image_1780745044078.jpg",
+        "title": "The Tech Support Call",
+        "caption": "Dad logic: Why call customer service when you can just press every button on the remote simultaneously to hard reset the space-time continuum?"
+      },
+      {
+        "url": "/src/assets/images/simply_comical_art_1780735531877.png",
+        "title": "The Unsolicited Morning Lecture",
+        "caption": "A 5-minute request on how to boil an egg quickly escalates into a 45-minute masterclass on global agricultural supply chains."
+      },
+      {
+        "url": "/src/assets/images/imagination_line_art_1780735570966.png",
+        "title": "The Master Chef Experiment",
+        "caption": "Dad decides to substitute baking powder with detergent 'because they both have sodium and make bubbles'."
+      }
+    ],
+    "details": {
+      "client": "Self-Published Comic Series",
+      "role": "Comic Writer & Lead Cartoonist",
+      "date": "2023 - Present",
+      "challenge": "Crafting highly identifiable everyday family dialogues into instant single- or multi-panel layouts that resonate with diverse readers.",
+      "solution": "Developed a signature hand-drawn comic format focusing on expressive gesture dynamics, clear typography, and a warm, inviting feel.",
+      "impact": "Garnered highly organic fan engagement and thousands of page views across online channels."
+    }
+  },
+  {
+    "id": "upscie-daisy",
+    "title": "Upscie Daisy",
+    "subtitle": "Playful Scientific Adventures",
+    "description": "Bridging the gap between scientific jargon and popular reading. This creative comic strip series uses humorous cartoon characters to unpack major scientific discoveries and curiosities.",
+    "category": "comics",
+    "image": "/src/assets/images/imagination_line_art_1780735570966.png",
+    "tags": ["Sci-Comm", "Educational Comics", "Graphic Humour", "Visual Wit"],
+    "comicPages": [
+      {
+        "url": "/src/assets/images/imagination_line_art_1780735570966.png",
+        "title": "Episode 1: Quantum Uncertainty",
+        "caption": "Daisy learns that sometimes being lost isn't a lack of direction—it is just maintaining a highly sophisticated state of possibilities."
+      },
+      {
+        "url": "/src/assets/images/simply_comical_art_1780735531877.png",
+        "title": "Episode 2: The Energy Budget",
+        "caption": "The cells hold an emergency town hall to discuss why 90% of the daily glucose budget is spent overthinking an interaction from 2018."
+      }
+    ],
+    "details": {
+      "client": "Creative Science Initiatives",
+      "role": "Illustrator & Science Communicator",
+      "date": "2024",
+      "challenge": "Converting rigorous technical findings and molecular mechanics into lightweight storytelling structures without losing accuracy.",
+      "solution": "Created custom character guides (like Daisy the microscopic explorer) who navigate scientific phenomena via punchy, hand-drawn comic layouts.",
+      "impact": "Used in schools and educational campaigns to increase curiosity and student interaction with science research."
+    }
+  },
+  {
+    "id": "tikku-comics",
+    "title": "Tikku Comics",
+    "subtitle": "Charming Miniature Journeys",
+    "description": "The whimsical, modern adventures of Tikku, an expressive miniature hero with a giant imagination. Negotiating the obstacles of a large world through comical, lighthearted, and occasionally philosophical panels.",
+    "category": "comics",
+    "image": "/src/assets/images/simply_comical_art_1780735531877.png",
+    "tags": ["Indie Comics", "Micro-storytelling", "Character Branding", "Daily Strip"],
+    "comicPages": [
+      {
+        "url": "/src/assets/images/simply_comical_art_1780735531877.png",
+        "title": "Panel 1: The Puddle Ocean",
+        "caption": "To a tiny hero, a simple sidewalk puddle is a deep-sea crossing. Pack the cardboard raft!"
+      },
+      {
+        "url": "/src/assets/images/regenerated_image_1780745044078.jpg",
+        "title": "Panel 2: Giants in the Garden",
+        "caption": "Observing a friendly giant ladybug who seems entirely unmoved by Tikku's attempts at miniature diplomatic negotiations."
+      }
+    ],
+    "details": {
+      "client": "Simply Comical Publishing",
+      "role": "Creator & Artist",
+      "date": "2023 - Present",
+      "challenge": "Maintaining high narrative consistency and clean visual weight in small square panel ratios optimal for fast digital viewing.",
+      "solution": "Crafted simple vector line layouts, generous expressions, and quick witty dialogues carrying universal human messages.",
+      "impact": "Established a core loyal audience that enjoys the playful intersection of philosophical curiosity and cartoon charm."
+    }
+  },
+  {
+    "id": "science-illustrations",
+    "title": "Science Illustrations",
+    "subtitle": "High-Impact Scientific Visualizations",
+    "description": "Translating research and lab publications into visual art. Designing editorial science illustrations, informative graphics, and biology diagrams for philanthropy foundations, textbooks, and public programs.",
+    "category": "science_illustrations",
+    "image": "/src/assets/images/imagination_line_art_1780735570966.png",
+    "tags": ["Technical Sketching", "Education Art", "Visual Literacy", "Diagrammatic Art"],
+    "details": {
+      "client": "Academic Journals & Charitable Programs",
+      "role": "Lead Visual Designer",
+      "date": "2024 - Present",
+      "challenge": "Ensuring absolute structural fidelity in anatomical or molecular drafts while making them visually captivating and readable in 3 seconds.",
+      "solution": "Utilized clean minimalist wireframes, distinct focal markers, and elegant color keys to lead the reader's eye structurally.",
+      "impact": "Increased information retention and engagement metrics for foundation briefs and whitepapers."
+    }
+  },
+  {
+    "id": "iawf-campaign",
+    "title": "India Animal Welfare Forum",
+    "subtitle": "National Welfare Publicity Drive",
+    "description": "Single-handedly spearheaded the comprehensive digital promotion, branding layout, and marketing strategies for Upadhyaya Foundation's landmark animal forum. Empowering outreach through custom graphics.",
+    "category": "marketing",
+    "image": "/src/assets/images/animal_welfare_campaign_1780735559310.png",
+    "tags": ["Campaign Branding", "Digital Promotion", "Outreach Strategy", "Social Impact"],
+    "details": {
+      "client": "Upadhyaya Foundation",
+      "role": "Solo Director of Digital Promotions",
+      "date": "2025",
+      "challenge": "Building a consistent, trustworthy visual identity for a major national welfare summit and driving nationwide attendance with zero media agency support.",
+      "solution": "Created animal welfare silhouettes, customized digital graphics, established cohesive content funnels, and coordinated social scheduling pipelines.",
+      "impact": "Drove record digital RSVPs, setting a new benchmark for programmatic stakeholder reporting and digital charity engagement."
+    }
+  },
+  {
+    "id": "mascot-systems",
+    "title": "Mascot Design",
+    "subtitle": "Brand Character Creation & Vectors",
+    "description": "Developing high-spirited custom cartoon mascots and character symbols. Perfect for representing corporate and non-profit narratives with warm, human, and memorable brand ambassadors.",
+    "category": "mascot_design",
+    "image": "/src/assets/images/branding_mockup_1780735544338.png",
+    "tags": ["Character Branding", "Logo Vectors", "Identity Design", "Mascot Styling"],
+    "details": {
+      "client": "Startup Teams & Foundation Partners",
+      "role": "Mascot Architect",
+      "date": "2024",
+      "challenge": "Encapsulating complex institutional philosophies into a single friendly mascot who can scale from tiny phone screens to giant physical event standees.",
+      "solution": "Created clean-vector mascots with iconic silhouettes, memorable color pairings (featuring rich golden yellows), and relatable posture dynamics.",
+      "impact": "Mascots introduced a human core to philanthropic drives, achieving high recall value and immediate community trust."
+    }
+  },
+  {
+    "id": "comic-workshops",
+    "title": "Comic-Making Workshops",
+    "subtitle": "Interactive Visual Storytelling Seminars",
+    "description": "Empowering students, researchers, kids, and working professionals to clarify complex thoughts and express critical narratives through basic drawing tricks, comic frameworks, and script templates.",
+    "category": "workshops",
+    "image": "/src/assets/images/simply_comical_art_1780735531877.png",
+    "tags": ["Workshop Tutoring", "Visual Thinking", "Class Instruction", "Public Speaking"],
+    "details": {
+      "client": "Schools & Community Centers",
+      "role": "Workshop Facilitator",
+      "date": "2023 - Present",
+      "challenge": "Overcoming the 'I can't draw' block and teaching solid visual layout structures within tight 2-hour learning schedules.",
+      "solution": "Engineered an intuitive formula translating characters into simple geometric grids and outlining clear storytelling steps in comic strip patterns.",
+      "impact": "Successfully trained hundreds of participants, fostering active visual literacy and alternative research communication techniques."
+    }
+  }
+]

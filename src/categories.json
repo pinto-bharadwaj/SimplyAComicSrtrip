@@ -1,0 +1,8 @@
+[
+  { "id": "all", "name": "All Projects" },
+  { "id": "comics", "name": "Comics" },
+  { "id": "science_illustrations", "name": "Science Illustrations" },
+  { "id": "workshops", "name": "Workshops" },
+  { "id": "marketing", "name": "Campaigns & Marketing" },
+  { "id": "mascot_design", "name": "Mascot Design" }
+]

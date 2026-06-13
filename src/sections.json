@@ -1,0 +1,32 @@
+[
+  {
+    "id": "hero",
+    "name": "Hero Section",
+    "title": "I transform ideas into visual narratives through illustration, design strategy, and storytelling.",
+    "subtitle": "Creative Portfolio & Vision Map",
+    "description": "My experience spans from philanthropy and social impact to creative design. From brand identities to comic-inspired illustrations, I believe complex ideas become memorable when told visually. To me, everything is a comic strip waiting to be drawn.",
+    "image": "/src/assets/images/regenerated_image_1780744497554.jpg"
+  },
+  {
+    "id": "bio",
+    "name": "Bio Spotlight Section",
+    "title": "Simplifying complex messages through custom graphics & responsive initiatives.",
+    "subtitle": "Philosophical Stance",
+    "description": "I believe every idea, emotion, and experience can be understood as a story. Much like a comic strip, life unfolds through a series of moments, characters, conflicts, and resolutions. My work is an attempt to capture these moments visually, simplifying complexity, finding humour in the ordinary, and transforming abstract concepts into narratives that people can connect with, remember, and share.",
+    "image": "/src/assets/images/branding_mockup_1780735544338.png"
+  },
+  {
+    "id": "experience_header",
+    "name": "Experience Section Header",
+    "title": "Career Highlights & Creative Initiatives",
+    "subtitle": "Interactive History",
+    "description": "A curated journey showcasing the intersection of narrative design, marketing, and public philanthropy."
+  },
+  {
+    "id": "contact_header",
+    "name": "Contact Section Header",
+    "title": "Ready to Draw Your Story?",
+    "subtitle": "Encrypted Terminal Contact",
+    "description": "Get in touch for custom mascot design, educational comics, branding strategy, or illustration workshops."
+  }
+]

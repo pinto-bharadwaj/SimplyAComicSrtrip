@@ -7,10 +7,28 @@ import {
 import { ProjectCategory, GalleryItem, ComicPage } from '../types';
 import { getApiUrl } from '../api';
 
-// Intercept all fetch operations to forward API calls to VITE_API_URL when set
-const fetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+// Intercept all fetch operations to forward API calls to VITE_API_URL when set, and append JWT headers
+const fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
   const target = typeof input === 'string' && input.startsWith('/api') ? getApiUrl(input) : input;
-  return window.fetch(target, init);
+  
+  const token = localStorage.getItem('admin_token');
+  const headers = new Headers(init?.headers);
+  if (token && typeof input === 'string' && input.startsWith('/api')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  const res = await window.fetch(target, {
+    ...init,
+    headers,
+  });
+
+  if (res.status === 401 && typeof input === 'string' && input.startsWith('/api') && input !== '/api/login') {
+    // Session expired or invalid token - trigger log out
+    localStorage.removeItem('admin_token');
+    window.dispatchEvent(new Event('cms-unauthorized'));
+  }
+
+  return res;
 };
 
 interface CmsDashboardProps {
@@ -125,6 +143,35 @@ export default function CmsDashboard({ onSaveSuccess }: CmsDashboardProps) {
     };
   }, [isOpen]);
 
+  // Check for existing token on mount
+  useEffect(() => {
+    const token = localStorage.getItem('admin_token');
+    if (token) {
+      const testToken = async () => {
+        try {
+          const res = await fetch('/api/admin/info');
+          if (res.ok) {
+            setIsAuthenticated(true);
+          } else {
+            localStorage.removeItem('admin_token');
+          }
+        } catch (err) {
+          localStorage.removeItem('admin_token');
+        }
+      };
+      testToken();
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setIsAuthenticated(false);
+      setAuthError('Your session has expired. Please log in again.');
+    };
+    window.addEventListener('cms-unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('cms-unauthorized', handleUnauthorized);
+  }, []);
+
   // Load projects, categories, sections, and comments from API on open or authenticating
   useEffect(() => {
     if (isOpen) {
@@ -132,9 +179,11 @@ export default function CmsDashboard({ onSaveSuccess }: CmsDashboardProps) {
       fetchCategories();
       fetchSections();
       fetchComments();
-      fetchInquiries();
+      if (isAuthenticated) {
+        fetchInquiries();
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, isAuthenticated]);
 
   useEffect(() => {
     if (isOpen && isAuthenticated) {
@@ -458,11 +507,12 @@ export default function CmsDashboard({ onSaveSuccess }: CmsDashboardProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.token) {
+        localStorage.setItem('admin_token', data.token);
         setIsAuthenticated(true);
         setAuthError('');
       } else {
-        const data = await res.json();
         setAuthError(data.error || 'Incorrect username or password.');
       }
     } catch (err) {
@@ -718,13 +768,28 @@ export default function CmsDashboard({ onSaveSuccess }: CmsDashboardProps) {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-2 text-neutral-400 hover:text-neutral-950 hover:bg-neutral-100 transition-colors cursor-pointer"
-                  title="Close Panel"
-                >
-                  <X className="w-6 h-6" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {isAuthenticated && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        localStorage.removeItem('admin_token');
+                        setIsAuthenticated(false);
+                      }}
+                      className="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 font-sans text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+                      title="Log Out Admin Session"
+                    >
+                      Log Out
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="p-2 text-neutral-400 hover:text-neutral-950 hover:bg-neutral-100 transition-colors cursor-pointer"
+                    title="Close Panel"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
               </div>
 
               {/* UN-AUTHENTICATED ACCESS VIEW */}

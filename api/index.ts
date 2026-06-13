@@ -5,6 +5,7 @@ import multer from 'multer';
 import { initializeApp } from 'firebase/app';
 import { initializeFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import nodemailer from 'nodemailer';
+import { authenticateToken, generateToken, hashPassword, generateSalt, AuthenticatedRequest } from './auth';
 
 const app = express();
 
@@ -13,16 +14,16 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Paths resolved relative to current working directory (project root)
-const uploadsDir = path.join(process.cwd(), 'src', 'assets', 'images');
-const dbPath = path.join(process.cwd(), 'src', 'projects.json');
-const categoriesDbPath = path.join(process.cwd(), 'src', 'categories.json');
-const sectionsDbPath = path.join(process.cwd(), 'src', 'sections.json');
-const commentsDbPath = path.join(process.cwd(), 'src', 'comments.json');
-const adminDbPath = path.join(process.cwd(), 'src', 'admin.json');
-const inquiriesDbPath = path.join(process.cwd(), 'src', 'inquiries.json');
+const uploadsDir = path.join(__dirname, '..', 'src', 'assets', 'images');
+const dbPath = path.join(__dirname, '..', 'src', 'projects.json');
+const categoriesDbPath = path.join(__dirname, '..', 'src', 'categories.json');
+const sectionsDbPath = path.join(__dirname, '..', 'src', 'sections.json');
+const commentsDbPath = path.join(__dirname, '..', 'src', 'comments.json');
+const adminDbPath = path.join(__dirname, '..', 'src', 'admin.json');
+const inquiriesDbPath = path.join(__dirname, '..', 'src', 'inquiries.json');
 
 // Initialize Firebase Firestore dynamically from config or environment variables
-const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+const configPath = path.join(__dirname, '..', 'firebase-applet-config.json');
 let db: any = null;
 
 if (fs.existsSync(configPath)) {
@@ -195,7 +196,7 @@ app.get('/api/categories', async (req, res) => {
 });
 
 // API Endpoint - Save/Update all categories
-app.post('/api/categories', async (req, res) => {
+app.post('/api/categories', authenticateToken, async (req, res) => {
   try {
     const categories = req.body;
     if (!Array.isArray(categories)) {
@@ -221,7 +222,7 @@ app.get('/api/projects', async (req, res) => {
 });
 
 // API Endpoint - Save/Update all projects
-app.post('/api/projects', async (req, res) => {
+app.post('/api/projects', authenticateToken, async (req, res) => {
   try {
     const projects = req.body;
     if (!Array.isArray(projects)) {
@@ -247,7 +248,7 @@ app.get('/api/sections', async (req, res) => {
 });
 
 // API Endpoint - Save/Update all website sections
-app.post('/api/sections', async (req, res) => {
+app.post('/api/sections', authenticateToken, async (req, res) => {
   try {
     const sections = req.body;
     if (!Array.isArray(sections)) {
@@ -300,7 +301,7 @@ app.post('/api/comments', async (req, res) => {
 });
 
 // API Endpoint - Delete/Moderate a visitor comment (Admins only)
-app.delete('/api/comments/:id', async (req, res) => {
+app.delete('/api/comments/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const comments = await getData('comments', commentsDbPath, []);
@@ -408,8 +409,60 @@ async function sendInquiryEmail(formData: { name: string; email: string; subject
   }
 }
 
+// Helper for sending verification OTP via email
+async function sendOTPEmail(email: string, otp: string) {
+  console.log(`[OTP EMAIL] Sending verification code ${otp} to ${email}`);
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const port = parseInt(process.env.SMTP_PORT || '587');
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  const mailOptions = {
+    from: `"Simply Comical Security" <${user || 'security@simplycomical.com'}>`,
+    to: email,
+    subject: `Secure OTP: ${otp} - Admin Panel Verification`,
+    text: `Hello,\n\nYou have requested an administrative credential update on your Simply Comical Portfolio website.\n\nYour secure verification code is: ${otp}\n\nThis OTP is valid for 10 minutes. If you did not request this update, please ignore this email and review your admin panel access immediately.\n\nSent automatically from Vercel.\n`,
+    html: `
+<div style="font-family: sans-serif; padding: 20px; color: #333; max-width: 600px; border: 1px solid #e5e5e5; border-radius: 4px;">
+  <h2 style="color: #d32f2f; border-bottom: 2px solid #FFDF20; padding-bottom: 10px; margin-top: 0; font-weight: normal; text-transform: uppercase; font-size: 18px; letter-spacing: 0.05em;">Security OTP Dispatched</h2>
+  <p>Hello,</p>
+  <p>You have requested an administrative credential update on your <strong>Simply Comical Portfolio</strong> website.</p>
+  
+  <div style="background-color: #f9f9f9; padding: 20px; border-left: 4px solid #d32f2f; margin: 20px 0; text-align: center;">
+    <p style="margin-top: 0; font-size: 13px; text-transform: uppercase; color: #666; letter-spacing: 0.05em;">Verification Code</p>
+    <div style="font-size: 32px; font-weight: bold; letter-spacing: 0.2em; color: #111; margin: 10px 0;">${otp}</div>
+    <p style="margin-bottom: 0; font-size: 11px; color: #888;">Valid for 10 minutes from receipt.</p>
+  </div>
+  
+  <p>If you did not initiate this request, please ignore this email and verify your administrator console security rules.</p>
+  
+  <p style="font-size: 11px; color: #999; margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
+    Sent automatically from Vercel. System Time: ${new Date().toISOString()}
+  </p>
+</div>
+`
+  };
+
+  if (user && pass) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure: port === 465,
+        auth: { user, pass }
+      });
+      await transporter.sendMail(mailOptions);
+      console.log(`[OTP EMAIL SUCCESS] OTP sent successfully via SMTP to ${email}`);
+    } catch (smtpErr) {
+      console.error(`[OTP EMAIL SMTP ERROR] Failed to send OTP email:`, smtpErr);
+    }
+  } else {
+    console.log(`[OTP EMAIL NOTICE] No SMTP credentials. OTP verification code is: ${otp}`);
+  }
+}
+
 // API Endpoint - Fetch all inquiries
-app.get('/api/inquiries', async (req, res) => {
+app.get('/api/inquiries', authenticateToken, async (req, res) => {
   try {
     const inquiries = await getData('inquiries', inquiriesDbPath, []);
     return res.json(inquiries);
@@ -452,7 +505,7 @@ app.post('/api/inquiries', async (req, res) => {
 });
 
 // API Endpoint - Delete/Clean an inquiry
-app.delete('/api/inquiries/:id', async (req, res) => {
+app.delete('/api/inquiries/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const inquiries = await getData('inquiries', inquiriesDbPath, []);
@@ -481,13 +534,33 @@ app.post('/api/login', async (req, res) => {
     });
     
     const targetUsername = adminConfig.username || 'admin';
-    const targetPassword = adminConfig.password || 'admin';
-    
     const givenUser = String(username || '').trim().toLowerCase();
     const targetUser = String(targetUsername).trim().toLowerCase();
     
-    if (givenUser === targetUser && password === targetPassword) {
-      return res.json({ success: true });
+    let isPasswordCorrect = false;
+    if (adminConfig.passwordHash && adminConfig.salt) {
+      const computedHash = hashPassword(password, adminConfig.salt);
+      isPasswordCorrect = (computedHash === adminConfig.passwordHash);
+    } else if (adminConfig.password) {
+      isPasswordCorrect = (password === adminConfig.password);
+      // Automatically upgrade plain-text password to hashed!
+      if (isPasswordCorrect) {
+        const salt = generateSalt();
+        const passwordHash = hashPassword(password, salt);
+        const upgradedConfig = {
+          username: targetUsername,
+          passwordHash,
+          salt,
+          email: adminConfig.email || 'bharadwajpreetham@gmail.com'
+        };
+        await saveData('admin', adminDbPath, upgradedConfig);
+        console.log('Admin password upgraded to secure hash format successfully.');
+      }
+    }
+    
+    if (givenUser === targetUser && isPasswordCorrect) {
+      const token = generateToken({ username: targetUsername });
+      return res.json({ success: true, token });
     } else {
       return res.status(401).json({ error: 'Incorrect username or password.' });
     }
@@ -498,7 +571,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // API Endpoint - Fetch admin info securely (excludes password)
-app.get('/api/admin/info', async (req, res) => {
+app.get('/api/admin/info', authenticateToken, async (req, res) => {
   try {
     const adminConfig = await getData('admin', adminDbPath, {
       username: 'admin',
@@ -515,7 +588,7 @@ app.get('/api/admin/info', async (req, res) => {
 });
 
 // API Endpoint - Generate and simulate sending OTP code
-app.post('/api/admin/send-otp', async (req, res) => {
+app.post('/api/admin/send-otp', authenticateToken, async (req, res) => {
   try {
     const { email, currentPassword } = req.body;
     if (!email || !currentPassword) {
@@ -528,9 +601,11 @@ app.post('/api/admin/send-otp', async (req, res) => {
       email: 'bharadwajpreetham@gmail.com'
     });
     
-    const targetPassword = adminConfig.password || 'admin';
+    const currentPasswordCorrect = adminConfig.passwordHash && adminConfig.salt
+      ? hashPassword(currentPassword, adminConfig.salt) === adminConfig.passwordHash
+      : currentPassword === adminConfig.password;
     
-    if (currentPassword !== targetPassword) {
+    if (!currentPasswordCorrect) {
       return res.status(401).json({ error: 'Current password does not match.' });
     }
     
@@ -542,10 +617,16 @@ app.post('/api/admin/send-otp', async (req, res) => {
     
     console.log(`[SECURE CENTRAL SECURITY OTP] Dynamic verification code generated for ${email} is: ${otp}`);
     
+    // Async OTP email dispatch
+    sendOTPEmail(email, otp).catch(err => console.error('Failed to send OTP email:', err));
+
+    const isProduction = process.env.NODE_ENV === 'production';
+    
     return res.json({ 
       success: true, 
       message: `A secure verification OTP has been triggered and sent to ${email}.`,
-      simulatedOtp: otp // Expose OTP for developers to verify and test locally!
+      // Expose OTP for developers to verify and test locally, but hide in production!
+      ...(!isProduction ? { simulatedOtp: otp } : {})
     });
   } catch (err: any) {
     console.error('Error generating OTP:', err);
@@ -554,7 +635,7 @@ app.post('/api/admin/send-otp', async (req, res) => {
 });
 
 // API Endpoint - Multi-credential modification (username, password, email)
-app.post('/api/admin/change-credentials', async (req, res) => {
+app.post('/api/admin/change-credentials', authenticateToken, async (req, res) => {
   try {
     const { currentPassword, newUsername, newEmail, newPassword, otp } = req.body;
     if (!currentPassword || !newUsername || !newEmail || !newPassword || !otp) {
@@ -567,9 +648,11 @@ app.post('/api/admin/change-credentials', async (req, res) => {
       email: 'bharadwajpreetham@gmail.com'
     });
     
-    const targetPassword = adminConfig.password || 'admin';
+    const currentPasswordCorrect = adminConfig.passwordHash && adminConfig.salt
+      ? hashPassword(currentPassword, adminConfig.salt) === adminConfig.passwordHash
+      : currentPassword === adminConfig.password;
     
-    if (currentPassword !== targetPassword) {
+    if (!currentPasswordCorrect) {
       return res.status(401).json({ error: 'Verification failed: Current password does not match.' });
     }
     
@@ -582,9 +665,13 @@ app.post('/api/admin/change-credentials', async (req, res) => {
     // OTP matched perfectly! Purge OTP and save new credentials
     await deleteOTP(newEmail);
     
+    const salt = generateSalt();
+    const passwordHash = hashPassword(newPassword, salt);
+    
     const newConfig = {
       username: String(newUsername).trim(),
-      password: String(newPassword).trim(),
+      passwordHash,
+      salt,
       email: String(newEmail).trim()
     };
     
@@ -598,7 +685,7 @@ app.post('/api/admin/change-credentials', async (req, res) => {
 });
 
 // API Endpoint - Upload Image (with Vercel Read-Only Failback)
-app.post('/api/upload', upload.single('image'), async (req, res) => {
+app.post('/api/upload', authenticateToken, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });

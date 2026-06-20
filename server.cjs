@@ -30,9 +30,9 @@ var import_vite = require("vite");
 var import_express = __toESM(require("express"), 1);
 var import_path = __toESM(require("path"), 1);
 var import_fs = __toESM(require("fs"), 1);
+var import_url = require("url");
 var import_multer = __toESM(require("multer"), 1);
-var import_app = require("firebase/app");
-var import_firestore = require("firebase/firestore");
+var import_client = require("@sanity/client");
 var import_nodemailer = __toESM(require("nodemailer"), 1);
 
 // api/auth.ts
@@ -84,7 +84,10 @@ function authenticateToken(req, res, next) {
 }
 
 // api/index.ts
+var import_meta = {};
 var app = (0, import_express.default)();
+var __filename = (0, import_url.fileURLToPath)(import_meta.url);
+var __dirname = import_path.default.dirname(__filename);
 app.use(import_express.default.json({ limit: "50mb" }));
 app.use(import_express.default.urlencoded({ extended: true, limit: "50mb" }));
 var uploadsDir = import_path.default.join(__dirname, "..", "src", "assets", "images");
@@ -94,58 +97,67 @@ var sectionsDbPath = import_path.default.join(__dirname, "..", "src", "sections.
 var commentsDbPath = import_path.default.join(__dirname, "..", "src", "comments.json");
 var adminDbPath = import_path.default.join(__dirname, "..", "src", "admin.json");
 var inquiriesDbPath = import_path.default.join(__dirname, "..", "src", "inquiries.json");
-var configPath = import_path.default.join(__dirname, "..", "firebase-applet-config.json");
-var db = null;
-if (import_fs.default.existsSync(configPath)) {
+var projectId = process.env.SANITY_PROJECT_ID;
+var dataset = process.env.SANITY_DATASET || "production";
+var apiToken = process.env.SANITY_API_TOKEN;
+var sanityClient = null;
+if (projectId && apiToken) {
   try {
-    const firebaseConfig = JSON.parse(import_fs.default.readFileSync(configPath, "utf-8"));
-    const fbApp = (0, import_app.initializeApp)(firebaseConfig);
-    db = (0, import_firestore.initializeFirestore)(fbApp, { experimentalForceLongPolling: true }, firebaseConfig.firestoreDatabaseId);
-    console.log("Firebase initialized successfully from config file with database ID:", firebaseConfig.firestoreDatabaseId);
+    sanityClient = (0, import_client.createClient)({
+      projectId,
+      dataset,
+      useCdn: false,
+      // Set to false for write/real-time read, true for fast cached reads
+      apiVersion: "2023-05-03",
+      token: apiToken
+    });
+    console.log(`Sanity client initialized successfully for project ${projectId}, dataset ${dataset}.`);
   } catch (err) {
-    console.error("Failed to initialize Firebase from config file:", err);
+    console.error("Failed to initialize Sanity client:", err);
   }
 } else {
-  const firebaseConfigStr = process.env.FIREBASE_CONFIG;
-  if (firebaseConfigStr) {
-    try {
-      const firebaseConfig = JSON.parse(firebaseConfigStr);
-      const fbApp = (0, import_app.initializeApp)(firebaseConfig);
-      db = (0, import_firestore.initializeFirestore)(fbApp, { experimentalForceLongPolling: true }, firebaseConfig.firestoreDatabaseId);
-      console.log("Firebase initialized successfully from environment variable.");
-    } catch (err) {
-      console.error("Failed to initialize Firebase from environment variable:", err);
-    }
-  } else {
-    console.log("No firebase-applet-config.json or FIREBASE_CONFIG env found. Falling back to local files.");
-  }
+  console.log("No SANITY_PROJECT_ID or SANITY_API_TOKEN found in environment. Falling back to local files.");
 }
+var typeMap = {
+  projects: "project",
+  categories: "category",
+  sections: "section",
+  comments: "comment",
+  inquiries: "inquiry",
+  admin: "admin"
+};
 var otpStorage = /* @__PURE__ */ new Map();
 async function storeOTP(email, otp, expiresAt) {
   const emailKey = email.trim().toLowerCase();
   otpStorage.set(emailKey, { otp, expiresAt });
-  if (db) {
+  if (sanityClient) {
     try {
-      const docRef = (0, import_firestore.doc)(db, "otps", emailKey);
-      await (0, import_firestore.setDoc)(docRef, { otp, expiresAt });
-      console.log(`Stored OTP in Firestore for ${emailKey}`);
+      const docId = `otp_${emailKey.replace(/[^a-zA-Z0-9_.-]/g, "_")}`;
+      await sanityClient.createOrReplace({
+        _type: "otp",
+        _id: docId,
+        email: emailKey,
+        otp,
+        expiresAt
+      });
+      console.log(`Stored OTP in Sanity for ${emailKey}`);
     } catch (err) {
-      console.error(`Failed to store OTP in Firestore for ${emailKey}:`, err);
+      console.error(`Failed to store OTP in Sanity for ${emailKey}:`, err);
     }
   }
 }
 async function verifyOTP(email, otp) {
   const emailKey = email.trim().toLowerCase();
   let cached = otpStorage.get(emailKey);
-  if (db) {
+  if (sanityClient) {
     try {
-      const docRef = (0, import_firestore.doc)(db, "otps", emailKey);
-      const docSnap = await (0, import_firestore.getDoc)(docRef);
-      if (docSnap.exists()) {
-        cached = docSnap.data();
+      const docId = `otp_${emailKey.replace(/[^a-zA-Z0-9_.-]/g, "_")}`;
+      const res = await sanityClient.fetch(`*[_type == "otp" && _id == $docId][0]`, { docId });
+      if (res) {
+        cached = { otp: res.otp, expiresAt: res.expiresAt };
       }
     } catch (err) {
-      console.error(`Failed to fetch OTP from Firestore for ${emailKey}:`, err);
+      console.error(`Failed to fetch OTP from Sanity for ${emailKey}:`, err);
     }
   }
   if (!cached) return false;
@@ -155,12 +167,13 @@ async function verifyOTP(email, otp) {
 async function deleteOTP(email) {
   const emailKey = email.trim().toLowerCase();
   otpStorage.delete(emailKey);
-  if (db) {
+  if (sanityClient) {
     try {
-      const docRef = (0, import_firestore.doc)(db, "otps", emailKey);
-      await (0, import_firestore.setDoc)(docRef, { otp: "", expiresAt: 0 });
+      const docId = `otp_${emailKey.replace(/[^a-zA-Z0-9_.-]/g, "_")}`;
+      await sanityClient.delete(docId);
+      console.log(`Deleted OTP from Sanity for ${emailKey}`);
     } catch (err) {
-      console.error(`Failed to clear OTP from Firestore for ${emailKey}:`, err);
+      console.error(`Failed to clear OTP from Sanity for ${emailKey}:`, err);
     }
   }
 }
@@ -175,36 +188,7 @@ function readLocalFile(filePath, defaultData) {
   }
   return defaultData;
 }
-async function getData(collectionName, filePath, defaultData) {
-  if (db) {
-    try {
-      const docRef = (0, import_firestore.doc)(db, "cms_sync", collectionName);
-      const docSnap = await (0, import_firestore.getDoc)(docRef);
-      if (docSnap.exists()) {
-        const cloudData = docSnap.data().data;
-        if (cloudData) {
-          return cloudData;
-        }
-      }
-      const localData = readLocalFile(filePath, defaultData);
-      await (0, import_firestore.setDoc)(docRef, { data: localData });
-      return localData;
-    } catch (err) {
-      console.error(`Error reading ${collectionName} from Firestore, falling back to local:`, err);
-    }
-  }
-  return readLocalFile(filePath, defaultData);
-}
-async function saveData(collectionName, filePath, data) {
-  if (db) {
-    try {
-      const docRef = (0, import_firestore.doc)(db, "cms_sync", collectionName);
-      await (0, import_firestore.setDoc)(docRef, { data });
-      console.log(`Saved ${collectionName} to Firestore.`);
-    } catch (err) {
-      console.error(`Error saving ${collectionName} to Firestore:`, err);
-    }
-  }
+function saveLocalFile(filePath, data) {
   try {
     if (!import_fs.default.existsSync(import_path.default.dirname(filePath))) {
       import_fs.default.mkdirSync(import_path.default.dirname(filePath), { recursive: true });
@@ -222,6 +206,106 @@ async function saveData(collectionName, filePath, data) {
     } catch (tmpErr) {
     }
   }
+}
+async function getData(collectionName, filePath, defaultData) {
+  const docType = typeMap[collectionName];
+  if (sanityClient && docType) {
+    try {
+      if (collectionName === "admin") {
+        const cloudData = await sanityClient.fetch(`*[_type == "admin" && _id == "admin_settings"][0]`);
+        if (cloudData) {
+          return cloudData;
+        }
+        const localData = readLocalFile(filePath, defaultData);
+        await sanityClient.createOrReplace({
+          _type: "admin",
+          _id: "admin_settings",
+          ...localData
+        });
+        return localData;
+      } else {
+        let query = `*[_type == $docType]`;
+        if (collectionName === "comments" || collectionName === "inquiries") {
+          query += ` | order(date desc)`;
+        }
+        const cloudData = await sanityClient.fetch(query, { docType });
+        if (cloudData && cloudData.length > 0) {
+          return cloudData.map((item) => ({
+            ...item,
+            id: item._id
+          }));
+        }
+        const localData = readLocalFile(filePath, defaultData);
+        if (Array.isArray(localData) && localData.length > 0) {
+          console.log(`Seeding Sanity collection "${collectionName}" from local file...`);
+          const transaction = sanityClient.transaction();
+          localData.forEach((item) => {
+            let id = item.id || item._id;
+            if (!id) {
+              id = `${docType}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            }
+            const docToSave = {
+              ...item,
+              _type: docType,
+              _id: id
+            };
+            delete docToSave.id;
+            transaction.createOrReplace(docToSave);
+          });
+          await transaction.commit();
+          console.log(`Seeding of "${collectionName}" completed.`);
+        }
+        return localData;
+      }
+    } catch (err) {
+      console.error(`Error reading ${collectionName} from Sanity, falling back to local:`, err);
+    }
+  }
+  return readLocalFile(filePath, defaultData);
+}
+async function saveData(collectionName, filePath, data) {
+  const docType = typeMap[collectionName];
+  if (sanityClient && docType) {
+    try {
+      if (collectionName === "admin") {
+        await sanityClient.createOrReplace({
+          _type: "admin",
+          _id: "admin_settings",
+          ...data
+        });
+        console.log(`Saved admin settings to Sanity.`);
+      } else if (Array.isArray(data)) {
+        console.log(`Syncing array for ${collectionName} to Sanity...`);
+        const existingDocs = await sanityClient.fetch(`*[_type == $docType]{_id}`, { docType });
+        const existingIds = existingDocs.map((doc) => doc._id);
+        const incomingIds = /* @__PURE__ */ new Set();
+        const transaction = sanityClient.transaction();
+        data.forEach((item) => {
+          let id = item.id || item._id;
+          if (!id) {
+            id = `${docType}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+          }
+          const docToSave = {
+            ...item,
+            _type: docType,
+            _id: id
+          };
+          delete docToSave.id;
+          transaction.createOrReplace(docToSave);
+          incomingIds.add(id);
+        });
+        const idsToDelete = existingIds.filter((id) => !incomingIds.has(id));
+        idsToDelete.forEach((id) => {
+          transaction.delete(id);
+        });
+        await transaction.commit();
+        console.log(`Successfully synced ${collectionName} to Sanity. Created/Updated: ${data.length}, Deleted: ${idsToDelete.length}`);
+      }
+    } catch (err) {
+      console.error(`Error saving ${collectionName} to Sanity:`, err);
+    }
+  }
+  saveLocalFile(filePath, data);
 }
 var upload = (0, import_multer.default)({
   storage: import_multer.default.memoryStorage(),

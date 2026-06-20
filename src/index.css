@@ -30,3 +30,14 @@ html {
   scroll-behavior: smooth;
   background-color: #fafaf9;
 }
+
+/* Zoomable portfolio image custom styles */
+.zoomable-image {
+  transform: scale(var(--zoom-level, 1));
+  transition: transform 0.55s ease, filter 0.55s ease;
+}
+
+.group:hover .zoomable-image {
+  transform: scale(calc(var(--zoom-level, 1) * 1.08));
+}
+

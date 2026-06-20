@@ -1046,14 +1046,14 @@ export default function CmsDashboard({ onSaveSuccess }: CmsDashboardProps) {
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-1 shrink-0">
+                          <div className="flex items-center gap-1.5 shrink-0">
                             <button
                               disabled={idx === 0}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleMoveProject(idx, 'up');
                               }}
-                              className={`opacity-0 group-hover:opacity-100 p-1 border transition-opacity cursor-pointer ${
+                              className={`p-1 border cursor-pointer ${
                                 idx === 0
                                   ? 'text-neutral-300 border-neutral-100 cursor-not-allowed'
                                   : 'text-neutral-500 hover:text-neutral-900 bg-neutral-50 border-neutral-200 hover:bg-neutral-100'
@@ -1068,7 +1068,7 @@ export default function CmsDashboard({ onSaveSuccess }: CmsDashboardProps) {
                                 e.stopPropagation();
                                 handleMoveProject(idx, 'down');
                               }}
-                              className={`opacity-0 group-hover:opacity-100 p-1 border transition-opacity cursor-pointer ${
+                              className={`p-1 border cursor-pointer ${
                                 idx === projects.length - 1
                                   ? 'text-neutral-300 border-neutral-100 cursor-not-allowed'
                                   : 'text-neutral-500 hover:text-neutral-900 bg-neutral-50 border-neutral-200 hover:bg-neutral-100'
@@ -1082,7 +1082,7 @@ export default function CmsDashboard({ onSaveSuccess }: CmsDashboardProps) {
                                 e.stopPropagation();
                                 handleDeleteProject(proj.id);
                               }}
-                              className="opacity-0 group-hover:opacity-100 p-1 text-red-400 hover:text-red-600 transition-opacity shrink-0 cursor-pointer hover:bg-red-50 border border-transparent hover:border-red-100"
+                              className="p-1 text-red-400 hover:text-red-650 shrink-0 cursor-pointer hover:bg-red-50 border border-transparent hover:border-red-100"
                               title="Delete project"
                             >
                               <Trash2 className="w-3.5 h-3.5" />

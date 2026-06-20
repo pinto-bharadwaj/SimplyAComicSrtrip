@@ -186,18 +186,18 @@ export default function Gallery({ refreshTrigger = 0 }: GalleryProps) {
                       playsInline
                       autoPlay
                       style={{
-                        '--zoom': `${(Number(item.imageZoom) || 100) / 100}`,
+                        '--zoom-level': `${(Number(item.imageZoom) || 100) / 100}`,
                       } as React.CSSProperties}
-                      className="w-full h-full object-cover transition-transform duration-550 [transform:scale(var(--zoom))] group-hover:[transform:scale(calc(var(--zoom)*1.08))]"
+                      className="w-full h-full object-cover zoomable-image"
                     />
                   ) : (
                     <img
                       src={item.image}
                       alt={item.title}
                       style={{
-                        '--zoom': `${(Number(item.imageZoom) || 100) / 100}`,
+                        '--zoom-level': `${(Number(item.imageZoom) || 100) / 100}`,
                       } as React.CSSProperties}
-                      className="w-full h-full object-cover transition-transform duration-550 filter group-hover:contrast-[1.01] [transform:scale(var(--zoom))] group-hover:[transform:scale(calc(var(--zoom)*1.08))]"
+                      className="w-full h-full object-cover zoomable-image"
                       referrerPolicy="no-referrer"
                     />
                   )}

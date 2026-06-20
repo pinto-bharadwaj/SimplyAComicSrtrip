@@ -1,6 +1,13 @@
 {
   "version": 2,
   "cleanUrls": true,
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": [
+        "src/*.json"
+      ]
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }

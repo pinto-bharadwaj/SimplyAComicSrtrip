@@ -28,6 +28,7 @@ export interface GalleryItem {
   link?: string;
   imageZoom?: number;
   imageAspectRatio?: 'square' | 'rectangle';
+  videoUrl?: string;
   details?: {
     client?: string;
     role: string;
@@ -36,6 +37,16 @@ export interface GalleryItem {
     solution: string;
     impact?: string;
   };
+}
+
+export interface WebsiteSection {
+  id: string;
+  name: string;
+  title: string;
+  subtitle?: string;
+  description: string;
+  image?: string;
+  layoutTemplate?: 'hero' | 'bio' | 'centered';
 }
 
 export interface ExperienceTimeline {

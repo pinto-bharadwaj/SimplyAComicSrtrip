@@ -1,0 +1,63 @@
+Implementation Plan - Deploying to Vercel
+Prepare the React (Vite) + Express (Node.js) application for deployment to Vercel as a single repository, ensuring all API endpoints, database functions, and local file fallbacks work correctly in a serverless environment.
+
+User Review Required
+IMPORTANT
+
+Vercel Login Credentials Required: When we run the deployment command, Vercel CLI will prompt for login. You will need to approve or log in.
+
+Environment Variables Configuration: Since Vercel serverless functions are stateless and ephemeral, any data updates written to local JSON files will be lost when the instance spins down. To persist portfolio changes, we must configure the Firebase Firestore integration on Vercel by setting the following Environment Variable in your Vercel Dashboard:
+
+FIREBASE_CONFIG: The JSON string containing your Firebase configuration (matching the contents of 
+firebase-applet-config.json
+).
+If you wish to use contact inquiries (email notifications), you should also configure:
+
+SMTP_HOST (e.g., smtp.gmail.com)
+SMTP_PORT (e.g., 587 or 465)
+SMTP_USER (SMTP username)
+SMTP_PASS (SMTP password)
+JWT_SECRET (A secret key for signing admin dashboard tokens)
+Proposed Changes
+Configuration Updates
+Modify 
+vercel.json
+ to instruct Vercel's Node.js builder to bundle the local database JSON files (src/*.json) and the Firebase config file (firebase-applet-config.json). This ensures that if Firebase is not yet configured, the app will fall back gracefully to reading the default seeded local files.
+
+[MODIFY] 
+vercel.json
+Add "functions" configuration block to specify "includeFiles" for api/index.ts.
+json
+
+{
+  "version": 2,
+  "cleanUrls": true,
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": [
+        "src/*.json",
+        "firebase-applet-config.json"
+      ]
+    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
+Verification Plan
+Automated Tests
+Run npm.cmd run build locally to verify there are no TypeScript or bundling compilation errors.
+Manual Verification
+Run npx.cmd vercel to start the deployment process.
+The user will log in or authenticate Vercel CLI.
+Deploy to a preview URL and test basic routes:
+Verify frontend loads under the deployment URL.
+Verify /api/categories and /api/projects endpoints load and return the seeded local data.
+
+
+https://preetham-bharadwaj-six.vercel.app/
+
+https://preetham-bharadwaj-92312494805.asia-southeast1.run.app/
+
+https://www.picartsky.com/

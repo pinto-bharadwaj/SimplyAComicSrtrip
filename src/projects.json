@@ -1,12 +1,51 @@
 [
   {
+    "id": "upscie-daisy",
+    "title": "Upscie Daisy",
+    "subtitle": "Playful Scientific Adventures",
+    "description": "Bridging the gap between scientific jargon and popular reading. This creative comic strip series uses humorous cartoon characters to unpack major scientific discoveries and curiosities.",
+    "category": "comics",
+    "image": "/src/assets/images/imagination_line_art_1780735570966.png",
+    "tags": [
+      "Sci-Comm",
+      "Educational Comics",
+      "Graphic Humour",
+      "Visual Wit"
+    ],
+    "comicPages": [
+      {
+        "url": "/src/assets/images/imagination_line_art_1780735570966.png",
+        "title": "Episode 1: Quantum Uncertainty",
+        "caption": "Daisy learns that sometimes being lost isn't a lack of direction—it is just maintaining a highly sophisticated state of possibilities."
+      },
+      {
+        "url": "/src/assets/images/simply_comical_art_1780735531877.png",
+        "title": "Episode 2: The Energy Budget",
+        "caption": "The cells hold an emergency town hall to discuss why 90% of the daily glucose budget is spent overthinking an interaction from 2018."
+      }
+    ],
+    "details": {
+      "client": "Creative Science Initiatives",
+      "role": "Illustrator & Science Communicator",
+      "date": "2024",
+      "challenge": "Converting rigorous technical findings and molecular mechanics into lightweight storytelling structures without losing accuracy.",
+      "solution": "Created custom character guides (like Daisy the microscopic explorer) who navigate scientific phenomena via punchy, hand-drawn comic layouts.",
+      "impact": "Used in schools and educational campaigns to increase curiosity and student interaction with science research."
+    }
+  },
+  {
     "id": "mr-dad-comics",
     "title": "Mr. Dad",
     "subtitle": "Nostalgic & Witty Fatherhood Comics",
     "description": "Introducing Mr Dad! This project features humorous comics based on the creator's interactions with his dad over the years. It is a fun, light-hearted look at the father-son relationship and will surely resonate with anyone who has a quirky, endearing relationship with their dad.",
     "category": "comics",
     "image": "/src/assets/images/regenerated_image_1780745044078.jpg",
-    "tags": ["Comic Strip", "Family Humor", "Slice of Life", "Character Design"],
+    "tags": [
+      "Comic Strip",
+      "Family Humor",
+      "Slice of Life",
+      "Character Design"
+    ],
     "comicPages": [
       {
         "url": "/src/assets/images/regenerated_image_1780745044078.jpg",
@@ -34,42 +73,18 @@
     }
   },
   {
-    "id": "upscie-daisy",
-    "title": "Upscie Daisy",
-    "subtitle": "Playful Scientific Adventures",
-    "description": "Bridging the gap between scientific jargon and popular reading. This creative comic strip series uses humorous cartoon characters to unpack major scientific discoveries and curiosities.",
-    "category": "comics",
-    "image": "/src/assets/images/imagination_line_art_1780735570966.png",
-    "tags": ["Sci-Comm", "Educational Comics", "Graphic Humour", "Visual Wit"],
-    "comicPages": [
-      {
-        "url": "/src/assets/images/imagination_line_art_1780735570966.png",
-        "title": "Episode 1: Quantum Uncertainty",
-        "caption": "Daisy learns that sometimes being lost isn't a lack of direction—it is just maintaining a highly sophisticated state of possibilities."
-      },
-      {
-        "url": "/src/assets/images/simply_comical_art_1780735531877.png",
-        "title": "Episode 2: The Energy Budget",
-        "caption": "The cells hold an emergency town hall to discuss why 90% of the daily glucose budget is spent overthinking an interaction from 2018."
-      }
-    ],
-    "details": {
-      "client": "Creative Science Initiatives",
-      "role": "Illustrator & Science Communicator",
-      "date": "2024",
-      "challenge": "Converting rigorous technical findings and molecular mechanics into lightweight storytelling structures without losing accuracy.",
-      "solution": "Created custom character guides (like Daisy the microscopic explorer) who navigate scientific phenomena via punchy, hand-drawn comic layouts.",
-      "impact": "Used in schools and educational campaigns to increase curiosity and student interaction with science research."
-    }
-  },
-  {
     "id": "tikku-comics",
     "title": "Tikku Comics",
     "subtitle": "Charming Miniature Journeys",
     "description": "The whimsical, modern adventures of Tikku, an expressive miniature hero with a giant imagination. Negotiating the obstacles of a large world through comical, lighthearted, and occasionally philosophical panels.",
     "category": "comics",
     "image": "/src/assets/images/simply_comical_art_1780735531877.png",
-    "tags": ["Indie Comics", "Micro-storytelling", "Character Branding", "Daily Strip"],
+    "tags": [
+      "Indie Comics",
+      "Micro-storytelling",
+      "Character Branding",
+      "Daily Strip"
+    ],
     "comicPages": [
       {
         "url": "/src/assets/images/simply_comical_art_1780735531877.png",
@@ -98,7 +113,12 @@
     "description": "Translating research and lab publications into visual art. Designing editorial science illustrations, informative graphics, and biology diagrams for philanthropy foundations, textbooks, and public programs.",
     "category": "science_illustrations",
     "image": "/src/assets/images/imagination_line_art_1780735570966.png",
-    "tags": ["Technical Sketching", "Education Art", "Visual Literacy", "Diagrammatic Art"],
+    "tags": [
+      "Technical Sketching",
+      "Education Art",
+      "Visual Literacy",
+      "Diagrammatic Art"
+    ],
     "details": {
       "client": "Academic Journals & Charitable Programs",
       "role": "Lead Visual Designer",
@@ -115,7 +135,12 @@
     "description": "Single-handedly spearheaded the comprehensive digital promotion, branding layout, and marketing strategies for Upadhyaya Foundation's landmark animal forum. Empowering outreach through custom graphics.",
     "category": "marketing",
     "image": "/src/assets/images/animal_welfare_campaign_1780735559310.png",
-    "tags": ["Campaign Branding", "Digital Promotion", "Outreach Strategy", "Social Impact"],
+    "tags": [
+      "Campaign Branding",
+      "Digital Promotion",
+      "Outreach Strategy",
+      "Social Impact"
+    ],
     "details": {
       "client": "Upadhyaya Foundation",
       "role": "Solo Director of Digital Promotions",
@@ -132,7 +157,12 @@
     "description": "Developing high-spirited custom cartoon mascots and character symbols. Perfect for representing corporate and non-profit narratives with warm, human, and memorable brand ambassadors.",
     "category": "mascot_design",
     "image": "/src/assets/images/branding_mockup_1780735544338.png",
-    "tags": ["Character Branding", "Logo Vectors", "Identity Design", "Mascot Styling"],
+    "tags": [
+      "Character Branding",
+      "Logo Vectors",
+      "Identity Design",
+      "Mascot Styling"
+    ],
     "details": {
       "client": "Startup Teams & Foundation Partners",
       "role": "Mascot Architect",
@@ -149,7 +179,12 @@
     "description": "Empowering students, researchers, kids, and working professionals to clarify complex thoughts and express critical narratives through basic drawing tricks, comic frameworks, and script templates.",
     "category": "workshops",
     "image": "/src/assets/images/simply_comical_art_1780735531877.png",
-    "tags": ["Workshop Tutoring", "Visual Thinking", "Class Instruction", "Public Speaking"],
+    "tags": [
+      "Workshop Tutoring",
+      "Visual Thinking",
+      "Class Instruction",
+      "Public Speaking"
+    ],
     "details": {
       "client": "Schools & Community Centers",
       "role": "Workshop Facilitator",

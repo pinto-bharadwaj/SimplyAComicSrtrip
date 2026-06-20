@@ -1,3 +1,6 @@
 {
-  "password": "admin"
+  "username": "admin",
+  "passwordHash": "aba567c1a1718928e749a40940d69f208863cdcc361b2a9fc2f2a9905d19437dc6875e3458a10a09b898fa1c9fc5c9a7ca305165be6fb9c7a244ace636077f9e",
+  "salt": "0c34cffa446b3ccd185675378a09d1a6",
+  "email": "bharadwajpreetham@gmail.com"
 }

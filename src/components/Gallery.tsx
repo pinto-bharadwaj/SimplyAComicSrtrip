@@ -84,11 +84,28 @@ export default function Gallery({ refreshTrigger = 0 }: GalleryProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isReading, activeItem]);
 
-  // Filter logic
-  const filteredItems = projects.filter((item) => {
-    if (selectedCategory === 'all') return true;
-    return item.category === selectedCategory;
-  });
+  const getProjectSortValue = (item: GalleryItem): number => {
+    const dateStr = item.details?.date || '';
+    if (!dateStr) return 0;
+    
+    const years = dateStr.match(/\b\d{4}\b/g)?.map(Number) || [];
+    const hasPresent = /present/i.test(dateStr);
+    
+    const startYear = years[0] || 0;
+    const endYear = hasPresent ? 2026 : (years[1] || years[0] || 0);
+    
+    return endYear * 10000 + startYear;
+  };
+
+  // Filter and sort logic
+  const filteredItems = projects
+    .filter((item) => {
+      if (selectedCategory === 'all') return true;
+      return item.category === selectedCategory;
+    })
+    .sort((a, b) => {
+      return getProjectSortValue(b) - getProjectSortValue(a);
+    });
 
   return (
     <section id="portfolio" className="py-24 bg-white border-t border-neutral-150">
@@ -147,9 +164,10 @@ export default function Gallery({ refreshTrigger = 0 }: GalleryProps) {
                 onClick={() => setActiveItem(item)}
               >
                 {/* Visual Thumbnail */}
-                <div className={`relative bg-neutral-50 overflow-hidden border-b border-neutral-150 ${
-                  item.imageAspectRatio === 'square' ? 'aspect-square' : 'aspect-[4/3]'
-                }`}>
+                <div 
+                  style={{ aspectRatio: item.imageAspectRatio === 'square' ? '1/1' : '4/3' }}
+                  className="relative bg-neutral-50 overflow-hidden border-b border-neutral-150 w-full"
+                >
                   <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/15 z-10 transition-colors duration-300 flex items-center justify-center">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
@@ -159,15 +177,30 @@ export default function Gallery({ refreshTrigger = 0 }: GalleryProps) {
                       View Study
                     </motion.div>
                   </div>
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    style={{
-                      '--zoom': `${(Number(item.imageZoom) || 100) / 100}`,
-                    } as React.CSSProperties}
-                    className="w-full h-full object-cover transition-transform duration-550 filter group-hover:contrast-[1.01] [transform:scale(var(--zoom))] group-hover:[transform:scale(calc(var(--zoom)*1.08))]"
-                    referrerPolicy="no-referrer"
-                  />
+                  {item.videoUrl ? (
+                    <video
+                      src={item.videoUrl}
+                      poster={item.image}
+                      muted
+                      loop
+                      playsInline
+                      autoPlay
+                      style={{
+                        '--zoom': `${(Number(item.imageZoom) || 100) / 100}`,
+                      } as React.CSSProperties}
+                      className="w-full h-full object-cover transition-transform duration-550 [transform:scale(var(--zoom))] group-hover:[transform:scale(calc(var(--zoom)*1.08))]"
+                    />
+                  ) : (
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      style={{
+                        '--zoom': `${(Number(item.imageZoom) || 100) / 100}`,
+                      } as React.CSSProperties}
+                      className="w-full h-full object-cover transition-transform duration-550 filter group-hover:contrast-[1.01] [transform:scale(var(--zoom))] group-hover:[transform:scale(calc(var(--zoom)*1.08))]"
+                      referrerPolicy="no-referrer"
+                    />
+                  )}
                   {/* Category Pill Over Image */}
                   <span className="absolute bottom-4 left-4 z-20 font-sans text-[9px] uppercase font-bold tracking-widest bg-yellow-400 text-neutral-950 border border-yellow-400 px-2.5 py-1">
                     {categories.find(c => c.id === item.category)?.name || item.category.replace('_', ' ')}
@@ -237,20 +270,33 @@ export default function Gallery({ refreshTrigger = 0 }: GalleryProps) {
                 </button>
 
                 <div className="grid grid-cols-1 md:grid-cols-2">
-                  {/* Left Column: Image Representation */}
-                  <div className={`relative bg-neutral-100 overflow-hidden min-h-[300px] border-b md:border-b-0 md:border-r border-neutral-200 flex items-center justify-center ${
-                    activeItem.imageAspectRatio === 'square' ? 'aspect-square h-auto' : 'h-64 md:h-auto'
-                  }`}>
-                    <img
-                      src={activeItem.image}
-                      alt={activeItem.title}
-                      style={{
-                        transform: `scale(${(Number(activeItem.imageZoom) || 100) / 100})`,
-                      }}
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-neutral-950/90 via-neutral-950/20 to-transparent p-6 text-white">
+                  {/* Left Column: Image/Video Representation */}
+                  <div 
+                    style={{ aspectRatio: activeItem.imageAspectRatio === 'square' ? '1/1' : '4/3' }}
+                    className="relative bg-neutral-100 overflow-hidden min-h-[300px] border-b md:border-b-0 md:border-r border-neutral-200 flex items-center justify-center w-full"
+                  >
+                    {activeItem.videoUrl ? (
+                      <video
+                        src={activeItem.videoUrl}
+                        controls
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <img
+                        src={activeItem.image}
+                        alt={activeItem.title}
+                        style={{
+                          transform: `scale(${(Number(activeItem.imageZoom) || 100) / 100})`,
+                        }}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-neutral-950/90 via-neutral-950/20 to-transparent p-6 text-white pointer-events-none">
                       <span className="font-sans text-[9px] tracking-widest uppercase font-bold bg-yellow-400 text-neutral-950 px-2.5 py-1 mb-2 inline-block">
                         {categories.find(c => c.id === activeItem.category)?.name || activeItem.category.replace('_', ' ')}
                       </span>

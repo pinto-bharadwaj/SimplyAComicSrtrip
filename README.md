@@ -9,7 +9,8 @@ This full-stack application includes customized galleries, slice-of-life comedy 
 
 Depending on your production requirements, you can host this application under two different styles:
 1.  **Option A (Static Only - completely FREE)**: Deploy the compiled client directly to **GitHub Pages** or **Cloudflare Pages**.
-2.  **Option B (Full-Stack - RECOMMENDED)**: Serve the frontend asset bundle statically, and host the small Node.js server on a container-capable runtime (like **Render**, **Railway**, **Fly.io**, or **Cloud Run**). This preserves 100% of the live CMS, comments, and email inquiry forwarding.
+2.  **Option B (Full-Stack - RECOMMENDED & FREE)**: Deploy the entire application (both frontend and backend Express serverless API) to **Vercel**. This is 100% free under the Hobby plan, avoids paid subscriptions, and preserves 100% of the live CMS, comments, and email inquiry forwarding.
+
 
 ---
 
@@ -45,30 +46,34 @@ We have added an automated deployment recipe inside `.github/workflows/deploy.ym
 
 ---
 
-## ⚡ Option B: Splitting Frontend (Static) & Back-End (Full-Stack)
+## ⚡ Option B: Unified Full-Stack Hosting on Vercel (100% FREE - RECOMMENDED)
 
-To keep all administrative editors, dynamic reviews, image upload drag-and-drops, and nodemailer dispatch forms fully active, configure a dedicated, inexpensive backend.
+You can host both the frontend and backend together on **Vercel** completely for free under the Hobby plan. Vercel automatically runs the React frontend and handles the Express backend (under `/api/*`) as free serverless functions.
 
-### 1. Build and Host the Node.js Express Backend
-You can deploy your dynamic backend on [Render](https://render.com) or [Railway](https://railway.app):
-1.  Log in to **Render** and click **New** > **Web Service**.
-2.  Connect your GitHub repository.
-3.  Select the following configuration properties:
-    *   **Runtime**: `Node`
-    *   **Build Command**: `npm install && npm run build` (This compiles both frontend static folders and bundles `server.ts` into a fast `dist/server.cjs` file)
-    *   **Start Command**: `npm start`
-4.  Add environment variables in Render's **Environment** tab:
-    *   `NODE_ENV`: `production`
-    *   `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (Optional, for inquiries emails)
-5.  Click **Deploy**. Render will host the backend and give you a URL like: `https://comical-api.onrender.com`.
+### Step-by-Step Vercel Setup:
+1.  Log in to [Vercel](https://vercel.com) using your GitHub account.
+2.  Click **Add New** > **Project** and import your `SimplyAComicSrtrip` repository.
+3.  Vercel will auto-detect the Vite framework. Keep the default settings.
+4.  If using Sanity.io or Email features, add your environment variables in Vercel's **Environment Variables** tab:
+    *   `SANITY_PROJECT_ID` (Your Sanity Project ID)
+    *   `SANITY_API_TOKEN` (Your Sanity API Token)
+    *   `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (Optional, for email inquiries)
+    *   `JWT_SECRET` (A custom random string to secure administrator tokens)
+5.  Click **Deploy**. Vercel will host your entire portfolio and provide a free secure URL like `https://preetham-bharadwaj.vercel.app`.
+6.  *(Optional)* Link your custom domain (`preethambharadwaj.com`) under project settings (**Settings** > **Domains**) for free.
 
-### 2. Connect your Static Frontend
-Now, tell GitHub Pages or Cloudflare Pages where to locate your newly deployed back-end:
-1.  On **Cloudflare Pages** or in your local environment, specify the environment variable during build:
-    ```env
-    VITE_API_URL=https://comical-api.onrender.com
-    ```
-2.  Redeploy the static client! The React app on GitHub Pages will now dynamically routes logins, edits, and contact forms to your secure back-end.
+Since both the frontend and backend are hosted on the same domain, you **do not need** to configure `VITE_API_URL`! The application will automatically route API requests relatively to `/api/*`.
+
+---
+
+## ⚡ Option C: Split Deployment (GitHub Pages Frontend + Vercel Backend)
+
+If you prefer to keep your frontend hosted on **GitHub Pages** (free) and only host your Express backend on **Vercel** (free):
+1.  Deploy the project to **Vercel** as described above to get your free backend API URL (e.g. `https://preetham-bharadwaj.vercel.app`).
+2.  In your GitHub repository settings, navigate to **Settings** > **Secrets and variables** > **Actions**.
+3.  Create a **Repository secret** named `VITE_API_URL` and set its value to your Vercel deployment URL (e.g., `https://preetham-bharadwaj.vercel.app`).
+4.  Redeploy the static client! The React app on GitHub Pages will now dynamically route logins, edits, and contact forms to your free Vercel backend.
+
 
 ---
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Filter, Eye, Tag, Calendar, User, Target, Compass, Award, ExternalLink, X, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Filter, Eye, Tag, Calendar, User, Target, Compass, Award, ExternalLink, X, BookOpen, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { GALLERY_ITEMS } from '../data';
 import { ProjectCategory, GalleryItem } from '../types';
 import { getApiUrl } from '../api';
@@ -23,6 +23,11 @@ export default function Gallery({ refreshTrigger = 0 }: GalleryProps) {
   const [activeItem, setActiveItem] = useState<GalleryItem | null>(null);
   const [isReading, setIsReading] = useState(false);
   const [currentComicPageIndex, setCurrentComicPageIndex] = useState(0);
+  const [isViewingPdf, setIsViewingPdf] = useState(false);
+
+  useEffect(() => {
+    setIsViewingPdf(false);
+  }, [activeItem]);
 
   // Load projects and categories from local JSON CMS database dynamically on load or trigger
   useEffect(() => {
@@ -97,14 +102,11 @@ export default function Gallery({ refreshTrigger = 0 }: GalleryProps) {
     return endYear * 10000 + startYear;
   };
 
-  // Filter and sort logic
+  // Filter logic (preserves manual database sorting order)
   const filteredItems = projects
     .filter((item) => {
       if (selectedCategory === 'all') return true;
       return item.category === selectedCategory;
-    })
-    .sort((a, b) => {
-      return getProjectSortValue(b) - getProjectSortValue(a);
     });
 
   return (
@@ -334,6 +336,39 @@ export default function Gallery({ refreshTrigger = 0 }: GalleryProps) {
                             <BookOpen className="w-4 h-4 shrink-0" />
                             Read Comic Strip ({activeItem.comicPages.length} Pages)
                           </button>
+                        </div>
+                      )}
+
+                      {/* PDF View CTA if pdf exists */}
+                      {activeItem.pdfUrl && (
+                        <div className="mb-8">
+                          <button
+                            onClick={() => setIsViewingPdf(!isViewingPdf)}
+                            className="w-full flex items-center justify-center gap-3 bg-neutral-950 text-white hover:bg-neutral-900 font-sans text-xs tracking-widest font-bold uppercase py-4 px-6 border-2 border-neutral-950 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 cursor-pointer"
+                          >
+                            <FileText className="w-4 h-4 shrink-0" />
+                            {isViewingPdf ? 'Hide PDF Document' : 'View PDF Document'}
+                          </button>
+                          
+                          {isViewingPdf && (
+                            <div className="mt-4 border border-neutral-200 rounded-lg overflow-hidden bg-neutral-50 p-2">
+                              <iframe
+                                src={activeItem.pdfUrl}
+                                className="w-full h-[500px]"
+                                title="Project PDF Document"
+                              />
+                              <div className="mt-2 text-right">
+                                <a
+                                  href={activeItem.pdfUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-sans text-[10px] tracking-widest uppercase font-bold text-neutral-600 hover:text-black border-b border-neutral-400 hover:border-black"
+                                >
+                                  Open PDF in New Tab
+                                </a>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
 

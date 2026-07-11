@@ -22,12 +22,12 @@ This document provides a highly detailed audit, hosting analysis, and step-by-st
     *   `src/admin.json` (CMS manager credentials)
     *   `src/inquiries.json` (Client lead contact briefs)
 
-### C. Firebase Services Integration
-*   **Role Identification**: Firebase Firestore is used strictly as a **dynamic cloud sync server-side agent** inside `server.ts`.
+### C. Sanity.io Services Integration
+*   **Role Identification**: Sanity.io is used as the **dynamic cloud database** inside `api/index.ts`.
 *   **Mechanics**:
-    *   At boot time, `server.ts` imports credentials from `firebase-applet-config.json` and fetches static files from the `cms_sync` collection to restore local files.
-    *   At run time, server API edits push records synchronously back to Firebase Firestore to prevent data loss across server cold starts.
-*   **Client Isolation**: **There is zero Firebase code in `/src` on the client side.** The frontend does not load or communicate with any Firebase Client SDK. It talks strictly to the Express backend via `/api/*` fetch requests.
+    *   At boot time, `api/index.ts` reads data from Sanity.io to populate categories, projects, sections, comments, and admin configurations.
+    *   At run time, server API edits push records directly to Sanity.io to prevent data loss across server cold starts.
+*   **Client Isolation**: **There is zero Sanity code in `/src` on the client side.** The frontend does not load or communicate with any Sanity Client SDK. It talks strictly to the Express backend via `/api/*` fetch requests.
 
 ### D. Server-Side Functionality (Compute Requirements)
 The following features depend on the Node.js/Express server runtime and **cannot run natively on static hosts like GitHub Pages** unless a split deployment is used:
@@ -56,7 +56,7 @@ These are system files tied specifically to the AI Studio Workspace platform:
 *   `firebase-applet-config.json` (Developer Firebase credentials)
 
 ### B. Files to Retain/Clean
-*   **Retain**: Keep `server.ts`! Even though GitHub Pages is static, keeping the backend code in your repository allows you to run it locally or deploy the full-stack version to Render or Railway. 
+*   **Retain**: Keep `server.ts`! Even though GitHub Pages is static, keeping the backend code in your repository allows you to run it locally or deploy the full-stack version to Vercel (which is completely free). 
 *   **Retain**: Keep the static databases (`src/*.json`), as they act as the immediate seed parameters for both local runs and production static builders.
 
 ### C. Dependencies Analysis
@@ -82,14 +82,14 @@ If compiling as a **Purely Static Asset Build** (no remote server), some depende
 
 To deploy your portfolio securely on **GitHub Pages** or **Cloudflare Pages** without breaking your premium CMS and interactive portfolio, there are two distinct architecture paths:
 
-### 🌟 Path A: The "Best of Both Worlds" Split Architecture (RECOMMENDED)
-Deploy your static frontend container to **GitHub Pages** for near-instant distribution, and host the minor, lightweight Express backend on a free backend container service (like **Render.com**, **Railway.app**, or **Fly.io**).
+### 🌟 Path A: The "Best of Both Worlds" Split Architecture
+Deploy your static frontend container to **GitHub Pages** for near-instant distribution, and host the minor, lightweight Express backend on **Vercel** (which is completely free and requires no paid subscription).
 
 *   **How it Works**:
     1.  Vite compiles your React app to pure index HTML/JS/CSS.
     2.  This static folder is served completely free by GitHub/Cloudflare Pages.
-    3.  When a user submits a contact form, logs in, or uploads an image, the frontend targets the absolute URL of your Express API (e.g. `https://your-backend.render.com`).
-    4.  Your backend keeps communicating with **Firebase Firestore** securely to back up and restore datasets, keeping all portfolio items fully, dynamic.
+    3.  When a user submits a contact form, logs in, or uploads an image, the frontend targets the absolute URL of your Express API (e.g. `https://your-backend.vercel.app`).
+    4.  Your backend keeps communicating with **Sanity.io** securely to back up and restore datasets, keeping all portfolio items fully dynamic.
 *   **Safe Client-Side Prepping**: Prepend frontend `fetch` targets with a configuration base variable `import.meta.env.VITE_API_URL`. When set, the static frontend will direct CMS traffic to your deployed backend, while falling back gracefully to relative endpoints.
 
 ### Path B: Pure Static Single Page Application
@@ -109,7 +109,7 @@ To perform the migration cleanly, we will write dynamic safety nets into our cod
 1.  **Configure API URL Interceptor**:
     Define a generic helper function to transparently append a remote server URL (`VITE_API_URL`) to API requests so that when hosted statically, it can seamlessly access your backend if configured.
 2.  **Add Deployment Artifacts**:
-    *   Create a production-ready `README.md` containing detailed GitHub Pages integration steps, Custom domain guidelines, and full-stack Render deploy manuals.
+    *   Create a production-ready `README.md` containing detailed GitHub Pages integration steps, Custom domain guidelines, and full-stack Vercel deploy manuals.
     *   Construct a secure GitHub Actions Workflow (`.github/workflows/deploy.yml`) to automatically compile and release updates on git pushes.
 3.  **Local Build Validation**:
     Verify that `npm run build` runs smoothly and prepares assets inside the standard `dist` output.

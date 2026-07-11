@@ -29,6 +29,7 @@ export interface GalleryItem {
   imageZoom?: number;
   imageAspectRatio?: 'square' | 'rectangle';
   videoUrl?: string;
+  pdfUrl?: string;
   details?: {
     client?: string;
     role: string;

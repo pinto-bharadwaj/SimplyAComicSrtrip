@@ -3,9 +3,7 @@
   "cleanUrls": true,
   "functions": {
     "api/index.ts": {
-      "includeFiles": [
-        "src/*.json"
-      ]
+      "includeFiles": "src/*.json"
     }
   },
   "rewrites": [

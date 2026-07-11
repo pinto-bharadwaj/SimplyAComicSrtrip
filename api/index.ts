@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import multer from 'multer';
 import { createClient } from '@sanity/client';
 import nodemailer from 'nodemailer';
-import { authenticateToken, generateToken, hashPassword, generateSalt, AuthenticatedRequest } from './auth';
+import { authenticateToken, generateToken, hashPassword, generateSalt, AuthenticatedRequest } from './auth.js';
 
 const app = express();
 

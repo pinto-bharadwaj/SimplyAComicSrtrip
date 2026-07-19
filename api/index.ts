@@ -173,6 +173,8 @@ async function getData(collectionName: string, filePath: string, defaultData: an
         let query = `*[_type == $docType]`;
         if (collectionName === 'comments' || collectionName === 'inquiries') {
           query += ` | order(date desc)`;
+        } else if (collectionName === 'projects' || collectionName === 'categories' || collectionName === 'sections') {
+          query += ` | order(order asc)`;
         }
         const cloudData = await sanityClient.fetch(query, { docType });
         if (cloudData && cloudData.length > 0) {
@@ -233,7 +235,7 @@ async function saveData(collectionName: string, filePath: string, data: any) {
         const incomingIds = new Set<string>();
         const transaction = sanityClient.transaction();
 
-        data.forEach((item: any) => {
+        data.forEach((item: any, idx: number) => {
           let id = item.id || item._id;
           if (!id) {
             id = `${docType}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -242,6 +244,7 @@ async function saveData(collectionName: string, filePath: string, data: any) {
             ...item,
             _type: docType,
             _id: id,
+            order: idx, // Store array index order
           };
           delete docToSave.id;
           transaction.createOrReplace(docToSave);

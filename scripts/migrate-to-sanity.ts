@@ -61,7 +61,7 @@ async function migrate() {
         }
         console.log(`Migrating ${localData.length} items for ${collectionName}...`);
         const transaction = sanityClient.transaction();
-        localData.forEach((item: any) => {
+        localData.forEach((item: any, idx: number) => {
           let id = item.id || item._id;
           if (!id) {
             id = `${docType}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -70,6 +70,7 @@ async function migrate() {
             ...item,
             _type: docType,
             _id: id,
+            order: idx, // Add order property!
           };
           delete docToSave.id;
           transaction.createOrReplace(docToSave);
